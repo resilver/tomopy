@@ -4,9 +4,14 @@ import numpy as np
 from scipy import misc
 import re
 import PIL.Image as Image
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
 
-def im2hd5(dirName='.', imageExt='tif', dataStart=0, dataEnd=None, scanStartRow=None, scanEndRow=None, whiteStart=None, whiteEnd=None, darkStart=None, darkEnd=None, dataClass = 'uint16', outputFilePath='out.h5'):
+
+def im2hd5(dirName='.', imageExt='tif', dataStart=0, dataEnd=None, scanStartRow=0, scanEndRow=None, whiteStart=None, whiteEnd=None, darkStart=None, darkEnd=None, dataClass = 'uint16', outputFilePath='out.h5'):
     # This function converts a directory full of sequentially-numbered images into an HDF5 file.
+    # scanStartRow and scanEndRow specify the vertical range of data to convert into the HDF5 file, 
+    # e.g., if you wanted to make an HDF5 file to quickly test reconstruction on just a few slices of data
        
     # Inform the user of where the output file is going to be written
     print 'Assembling HDF5 file: ' + os.path.realpath(outputFilePath)
@@ -21,7 +26,7 @@ def im2hd5(dirName='.', imageExt='tif', dataStart=0, dataEnd=None, scanStartRow=
     exchangeGrp = h5File.create_group("exchange");     
     
     # This determines the file names of the projection images.
-    projectionData = readImageStack(dirName, imageExt, dataStart, dataEnd, dataClass);
+    projectionData = readImageStack(dirName, imageExt, dataStart, dataEnd, dataClass=dataClass, scanStartRow=scanStartRow, scanEndRow=scanEndRow);
     
     # This creates a dataset called "data" within the group "exchange".
     # This dataset holds the raw projection images.
@@ -29,14 +34,14 @@ def im2hd5(dirName='.', imageExt='tif', dataStart=0, dataEnd=None, scanStartRow=
     
     # This determines the file names of the whitefield images.
     if whiteStart:
-        whiteData = readImageStack(dirName, imageExt, whiteStart, whiteEnd, dataClass);
+        whiteData = readImageStack(dirName, imageExt, whiteStart, whiteEnd, dataClass=dataClass, scanStartRow=scanStartRow, scanEndRow=scanEndRow);
         # This creates a dataset called "data_white" within the group "exchange".
         # This dataset holds the raw whitefield images.
         exchangeGrp.create_dataset('data_white', data=whiteData, dtype=dataClass);
     
     # This determines the file names of the darkfield images.
     if darkStart:
-        darkData = readImageStack(dirName, imageExt, darkStart, darkEnd, dataClass); 
+        darkData = readImageStack(dirName, imageExt, darkStart, darkEnd, dataClass=dataClass, scanStartRow=scanStartRow, scanEndRow=scanEndRow); 
         # This creates a dataset called "data_dark" within the group "exchange".
         # This dataset holds the raw darkfield images.
         exchangeGrp.create_dataset('data_dark', data=darkData, dtype=dataClass);
@@ -44,7 +49,7 @@ def im2hd5(dirName='.', imageExt='tif', dataStart=0, dataEnd=None, scanStartRow=
     # This closes the hdf5 file.
     h5File.close();
 
-def readImageStack(dirName='.', imageExt='tif', dataStart=0, dataEnd=None, dataClass='uint16'):
+def readImageStack(dirName='.', imageExt='tif', dataStart=0, dataEnd=None, scanStartRow=0, scanEndRow=None, dataClass='uint16'):
     # This function reads a series of images and returns a 3-D array that contains all the images in the series.
     # readImageStack searches the directory named dirName for files that end in the extension imageExt. 
     # Then it returns the first dataEnd - dataStart images.
@@ -61,13 +66,36 @@ def readImageStack(dirName='.', imageExt='tif', dataStart=0, dataEnd=None, dataC
     # Load in the first image to determine its dimensions, class, etc
     imageSize = Image.open(dirName + fileList[0]).size;
     
+    # Read the height and width of the image
+    imageHeight = imageSize[1];
+    imageWidth = imageSize[0];
+         
+    # This determines the last row that will be extracted from each image.
+    if scanEndRow:
+        endRow = scanEndRow
+    else:
+        endRow = imageHeight;
+    
+    # This counts the number of scan rows.
+    nScanRows = endRow - scanStartRow;
+    
     # Initialize the array to hole the images
-    imageStack = np.zeros([nImages, imageSize[1], imageSize[0]], dataClass)
+    imageStack = np.zeros([nImages, nScanRows, imageWidth], dataClass)
     
     # This loads each image. This seems like a bad way to do this because we have to hold the entire image stack in memory, so systems without a ton of memory will crash. 
     for k in imageNumbers:
+        # This determines the file path to the k'th image
         filePath = dirName + fileList[k]
-        imageStack[k, :, :] = np.reshape(Image.open(filePath), [imageSize[1], imageSize[0]])
+        # This loads in the image and reshapes it to be [x, y] formatted
+        # so that it fits into the image stack.
+        img = np.reshape(Image.open(filePath), [imageHeight, imageWidth]);      
+        # This crops the image
+        # img = np.transpose(img[scanStartRow:endRow, :]);
+        # img = img[scanStartRow:endRow, :];
+        imgCropped = img[scanStartRow:endRow, :]
+        
+        # This adds the k'th image to the image stack.
+        imageStack[k, :, :] = imgCropped;
    
     # This returns the image stack.
     return imageStack
