@@ -6,15 +6,29 @@ import re
 import PIL.Image as Image
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
+import datetime
+import shutil
 
 
-def im2hd5(dirName='.', imageExt='tif', dataStart=0, dataEnd=None, scanStartRow=0, scanEndRow=None, whiteStart=None, whiteEnd=None, darkStart=None, darkEnd=None, dataClass = 'uint16', outputFilePath='out.h5'):
+def im2hd5(dirName='.', imageExt='tif', dataStart=0, dataEnd=None, scanStartRow=0, scanEndRow=None, whiteStart=None, whiteEnd=None, darkStart=None, darkEnd=None, dataClass = 'uint16', outputDir='.', outputFileName = 'out.h5'):
     # This function converts a directory full of sequentially-numbered images into an HDF5 file.
     # scanStartRow and scanEndRow specify the vertical range of data to convert into the HDF5 file, 
     # e.g., if you wanted to make an HDF5 file to quickly test reconstruction on just a few slices of data
        
+    # Figure out the output file path
+    outputFilePath = os.path.join(outputDir, outputFileName)  
+       
     # Inform the user of where the output file is going to be written
     print 'Assembling HDF5 file: ' + os.path.realpath(outputFilePath)
+    
+    # Move the existing file to a temp folder.
+    if os.path.isfile(outputFilePath):
+        # Figure out what time it is, for naming the archived file
+        dateNum = datetime.datetime.now();
+        # Make an archive file path
+        archivePath = os.path.join(outputDir, "archive_" + dateNum.strftime("%d-%b-%Y_%H-%M-%S_") + outputFileName);
+        # Rename the existing file with the time-stamped archive file name.
+        shutil.move(outputFilePath, archivePath)
     
     # This creates the output hdf5 file. The 'w' means 'truncate the file if it already exists'
     h5File = h5py.File(outputFilePath, 'w');
@@ -61,10 +75,14 @@ def readImageStack(dirName='.', imageExt='tif', dataStart=0, dataEnd=None, scanS
     nImages = len(fileList)
     
     # This makes a list of images numbers.
-    imageNumbers = range(dataStart, dataEnd+1);
+    if dataEnd:
+        lastImage = dataEnd
+    else:lastImage = len(fileList)
+            
+    imageNumbers = range(dataStart, lastImage);
     
     # Load in the first image to determine its dimensions, class, etc
-    imageSize = Image.open(dirName + fileList[0]).size;
+    imageSize = Image.open(os.path.join(dirName, fileList[0])).size;
     
     # Read the height and width of the image
     imageHeight = imageSize[1];
@@ -80,12 +98,12 @@ def readImageStack(dirName='.', imageExt='tif', dataStart=0, dataEnd=None, scanS
     nScanRows = endRow - scanStartRow;
     
     # Initialize the array to hole the images
-    imageStack = np.zeros([nImages, nScanRows, imageWidth], dataClass)
+    imageStack = np.zeros([nImages-1, nScanRows, imageWidth], dataClass)
     
     # This loads each image. This seems like a bad way to do this because we have to hold the entire image stack in memory, so systems without a ton of memory will crash. 
-    for k in imageNumbers:
+    for k in range(len(imageNumbers)):
         # This determines the file path to the k'th image
-        filePath = dirName + fileList[k]
+        filePath = os.path.join(dirName, fileList[k])
         # This loads in the image and reshapes it to be [x, y] formatted
         # so that it fits into the image stack.
         img = np.reshape(Image.open(filePath), [imageHeight, imageWidth]);      
@@ -99,7 +117,7 @@ def readImageStack(dirName='.', imageExt='tif', dataStart=0, dataEnd=None, scanS
    
     # This returns the image stack.
     return imageStack
-     
+    
 def listImageFiles(dirName='.', imageExt='tif', dataStart=0, dataEnd=None):
     """
     This function returns a list of all the images of extension imType in the directory dirName. The returned list contains the first dataStart:dataEnd images.
@@ -114,8 +132,12 @@ def listImageFiles(dirName='.', imageExt='tif', dataStart=0, dataEnd=None):
     fileList = [fileName for fileName in dirContents if re.search('.*\.%s' %(imageExt), fileName)]
     
     # This returns the section of the image list between the start and end image numbers.
-    return fileList[dataStart : dataEnd + 1]
-
+    if dataEnd:
+        return fileList[dataStart : dataEnd + 1]
+    else:
+        return fileList;
+        
+        
 
 
     
