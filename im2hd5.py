@@ -41,20 +41,19 @@ def im2hd5(dirName='.', imageExt='tif', dataStart=0, dataEnd=None, scanStartRow=
     
     # This determines the file names of the projection images.
     projectionData = readImageStack(dirName, imageExt, dataStart, dataEnd, dataClass=dataClass, scanStartRow=scanStartRow, scanEndRow=scanEndRow);
-    
     # This creates a dataset called "data" within the group "exchange".
     # This dataset holds the raw projection images.
     exchangeGrp.create_dataset('data', data=projectionData, dtype=dataClass);
     
     # This determines the file names of the whitefield images.
-    if whiteStart:
+    if whiteStart > -1:
         whiteData = readImageStack(dirName, imageExt, whiteStart, whiteEnd, dataClass=dataClass, scanStartRow=scanStartRow, scanEndRow=scanEndRow);
         # This creates a dataset called "data_white" within the group "exchange".
         # This dataset holds the raw whitefield images.
         exchangeGrp.create_dataset('data_white', data=whiteData, dtype=dataClass);
-    
+        
     # This determines the file names of the darkfield images.
-    if darkStart:
+    if darkStart > -1:
         darkData = readImageStack(dirName, imageExt, darkStart, darkEnd, dataClass=dataClass, scanStartRow=scanStartRow, scanEndRow=scanEndRow); 
         # This creates a dataset called "data_dark" within the group "exchange".
         # This dataset holds the raw darkfield images.
