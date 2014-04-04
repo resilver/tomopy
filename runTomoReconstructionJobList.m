@@ -5,8 +5,7 @@ nJobs = length(JOBLIST);
 
 % Loop over all jobs
 for n = 1 : nJobs
-    JobFile = JOBLIST(n);
-    
+    JobFile = JOBLIST(n);   
     % Determine the paths to the input and output data repositories.
     inputRepository = JobFile.InputDataRepository;
     outputRepository = JobFile.OutputDataRepository;
@@ -98,7 +97,6 @@ for n = 1 : nJobs
     
     %% This part converts the TIF images to HDF5 format.
     if JobFile.JobOptions.ConvertTiffToHDF5
-%     if 1 == 0; % This is disabled because I can't get it to work.
         try
             tiff_to_hdf5(JobFile);
         catch ER
@@ -109,8 +107,7 @@ for n = 1 : nJobs
     
     %% This part runs the tomographic reconstructions.
     % This is disabled.
-    if 1 == 0;
-%     if JobFile.JobOptions.ConvertHDF5ToRecon
+    if JobFile.JobOptions.ConvertHDF5ToRecon
         try
             runTomoReconstructions(JobFile);        
         catch ER

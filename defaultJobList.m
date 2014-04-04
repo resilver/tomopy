@@ -40,18 +40,17 @@ DefaultJob.HDF4_To_Tiff.EndImage = inf;
 DefaultJob.Tiff_To_HDF5.InputDirectory = DefaultJob.HDF4_To_Tiff.OutputDataDir;
 DefaultJob.Tiff_To_HDF5.ImageExt = DefaultJob.HDF4_To_Tiff.OutputFileExtension;
 DefaultJob.Tiff_To_HDF5.StartImage = 1;
-DefaultJob.Tiff_To_HDF5.EndImage = false;
-DefaultJob.Tiff_To_HDF5.ScanStartRow = 0;
-DefaultJob.Tiff_To_HDF5.ScanEndRow = false;
+DefaultJob.Tiff_To_HDF5.EndImage = NaN;
+DefaultJob.Tiff_To_HDF5.ScanStartRow = 300;
+DefaultJob.Tiff_To_HDF5.ScanEndRow = 320;
 DefaultJob.Tiff_To_HDF5.WhiteStart = 0;
 DefaultJob.Tiff_To_HDF5.WhiteEnd = 0;
-DefaultJob.Tiff_To_HDF5.DarkStart = false;
-DefaultJob.Tiff_To_HDF5.DarkEnd = false;
+DefaultJob.Tiff_To_HDF5.DarkStart = NaN;
+DefaultJob.Tiff_To_HDF5.DarkEnd = NaN;
 DefaultJob.Tiff_To_HDF5.DataClass = 'uint16';
 DefaultJob.Tiff_To_HDF5.OutputDir = fullfile(DefaultJob.OutputDataRepository, DefaultJob.CaseName, 'h5');
 DefaultJob.Tiff_To_HDF5.OutputFileName = [DefaultJob.CaseName '.h5'];
 DefaultJob.Tiff_To_HDF5.CodeName = 'im2hd5.py';
-
 
 % Parameters for hdf5 to tomo reconstruction
 DefaultJob.HDF5_To_Recon.InputDirectory = DefaultJob.Tiff_To_HDF5.OutputDir;
