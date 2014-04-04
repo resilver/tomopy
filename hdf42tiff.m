@@ -18,7 +18,7 @@ outputNumberFormat = ['%0' num2str(outputNumDigits) '.0f'];
 
 startImage = 1;
 endImage = 1444;
-skipImage = 1;
+
 
 
 imageNumbers = startImage : skipImage : endImage;
