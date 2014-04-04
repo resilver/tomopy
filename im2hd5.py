@@ -4,13 +4,13 @@ import numpy as np
 from scipy import misc
 import re
 import PIL.Image as Image
-import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
 import datetime
 import shutil
+import getopt
+import sys
+import pdb
 
-
- def im2hd5(dirName='.', imageExt='tif', dataStart=0, dataEnd=None, scanStartRow=0, scanEndRow=None, whiteStart=None, whiteEnd=None, darkStart=None, darkEnd=None, dataClass = 'uint16', outputDir='.', outputFileName = 'out.h5'):
+def im2hd5(dirName='.', imageExt='tif', dataStart=0, dataEnd=None, scanStartRow=0, scanEndRow=None, whiteStart=None, whiteEnd=None, darkStart=None, darkEnd=None, dataClass = 'uint16', outputDir='.', outputFileName = 'out.h5'):
 #def main(argv):
     # This function converts a directory full of sequentially-numbered images into an HDF5 file.
     # scanStartRow and scanEndRow specify the vertical range of data to convert into the HDF5 file, 
@@ -18,6 +18,14 @@ import shutil
        
     # Figure out the output file path
     outputFilePath = os.path.join(outputDir, outputFileName)  
+    
+    #handling imeageExt
+    imageExt = imageExt.lower()
+    if imageExt[0] is '.':
+        imageExt = imageExt[1:len(imageExt)]
+    if imageExt not in ['tif', 'gif', 'jpeg', 'jpg']:
+        print "Error - not a supported image type"
+        return
        
     # Inform the user of where the output file is going to be written
     print 'Assembling HDF5 file: ' + os.path.realpath(outputFilePath)
@@ -77,10 +85,11 @@ def readImageStack(dirName='.', imageExt='tif', dataStart=0, dataEnd=None, scanS
     # This makes a list of images numbers.
     if dataEnd!=None:
         lastImage = dataEnd
-    else:lastImage = len(fileList)
-            
-    imageNumbers = range(dataStart, lastImage + 1);
-    
+        #else:lastImage = len(fileList)
+        imageNumbers = range(dataStart, lastImage + 1);
+    else:
+        imageNumbers = range(dataStart, nImages)
+ 
     # Load in the first image to determine its dimensions, class, etc
     imageSize = Image.open(os.path.join(dirName, fileList[0])).size;
     
@@ -99,19 +108,17 @@ def readImageStack(dirName='.', imageExt='tif', dataStart=0, dataEnd=None, scanS
     
     # Initialize the array to hole the images
     imageStack = np.zeros([nImages, nScanRows, imageWidth], dataClass)
-    #imageStack = np.zeros([nImages, nScanRows, imageWidth], dataClass)
-    #pdb.set_trace()
     
-    # This loads each image. This seems like a bad way to do this because we have to hold the entire image stack in memory, so systems without a ton of memory will crash. 
+    # This loads each image. This seems like a bad way to do this because we have to hold the entire image stack in memory, so systems without a lot of memory could crash. 
     for k in range(len(imageNumbers)):
         # This determines the file path to the k'th image
+        if k % 10 is 0:
+            print "On image %d of %d" %(k, nImages)
         filePath = os.path.join(dirName, fileList[k])
         # This loads in the image and reshapes it to be [x, y] formatted
         # so that it fits into the image stack.
         img = np.reshape(Image.open(filePath), [imageHeight, imageWidth]);      
         # This crops the image
-        # img = np.transpose(img[scanStartRow:endRow, :]);
-        # img = img[scanStartRow:endRow, :];
         imgCropped = img[scanStartRow:endRow, :]
         
         # This adds the k'th image to the image stack.
@@ -125,8 +132,7 @@ def listImageFiles(dirName='.', imageExt='tif', dataStart=0, dataEnd=None):
     This function returns a list of all the images of extension imType in the directory dirName. The returned list contains the first dataStart:dataEnd images.
     The issue with this is that it will return other files of similar extension, which means that the raw data directory shouldn't have any other image files in it.
     
-    """
-    
+    """ 
     # This gets a list of all the files the directory named dirName
     dirContents = os.listdir(dirName)
     
@@ -139,12 +145,27 @@ def listImageFiles(dirName='.', imageExt='tif', dataStart=0, dataEnd=None):
     else:
         return fileList;
          
-
-# Some plumbing
+# These lines allow the code to be run from the command line.
 if __name__ == "__main__":
-    import sys, PythonCall
-    PythonCall.PythonCall(sys.argv).execute()
-
+    #import sys, PythonCall
+    #PythonCall.PythonCall(sys.argv).execute()
+    #(dirName='.', imageExt='tif', dataStart=0, dataEnd=None, scanStartRow=0, scanEndRow=None, whiteStart=None, whiteEnd=None, darkStart=None, darkEnd=None, dataClass = 'uint16', outputDir='.', outputFileName = 'out.h5'
+    #arglist = ["-dir", '-imext', '-dats', '-date', '-ssr', '-ser', '-ws', '-we', '-ds', '-de', '-dtype', '-outdir', '-outfn']
+    try:    
+        opt, args = getopt.getopt(sys.argv[1:], [] )
+    except: print "ERROR ERROR ERROR"
+    
+    if len(args) is 13:
+            
+        #pdb.set_trace()
+        for i in range(len(args)):
+            if args[i].isdigit():
+                args[i] = int(args[i])
+            if args[i] == 'None':
+                args[i] = None
+        print args
+            
+        im2hd5(*args)    
 
     
     

@@ -4,10 +4,10 @@ function DefaultJob = defaultJobList();
 DefaultJob.JobOptions.NumberOfProcessors = 1;
 
 % This specifies whether to convert the raw HDF4 data to tiffs.
-DefaultJob.JobOptions.ConvertHDF4ToTiff = true;
+DefaultJob.JobOptions.ConvertHDF4ToTiff = false;
 
 % Whether or not to convert the TIF images to HDF5 after transferring.
-DefaultJob.JobOptions.ConvertTiffToHDF5 = false;
+DefaultJob.JobOptions.ConvertTiffToHDF5 = true;
 
 % Whether or not to call the Python reconstruction code
 % after moving each dataset.

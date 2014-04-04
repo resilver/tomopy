@@ -21,27 +21,23 @@ output_dir = JobFile.Tiff_To_HDF5.OutputDir;
 output_file_name = JobFile.Tiff_To_HDF5.OutputFileName;
 code_name = JobFile.Tiff_To_HDF5.CodeName;
 
+end_data=10;
+
 % Make the output dir if it doesn't exist
 if ~exist(output_dir, 'dir')
     mkdir(output_dir);
 end
 
-String = ['%s(dirName=''%s'', imageExt=''%s'','...
-    'dataStart=%d, dataEnd=%d, scanStartRow=%d, '...
-    'scanEndRow=%d, whiteStart=%d, whiteEnd=%d, '...
-    'darkStart=%d, darkEnd=%d, dataClass=''%s'',' ...
-    'outputDir=''%s'', outputFileName=''%s'''];
-
-pythonInput = sprintf(String,code_name, input_directory, ...
-    input_image_ext, start_data, end_data,scan_start_row, ...
-    scan_end_row, white_start, white_end, dark_start, ...
-    dark_end, data_class, output_dir, output_file_name);
-
-% This is the command line statement that will run the code.
-command = sprintf('python -c ''%s''', pythonInput);
-
+% String = sprintf('source /Users/mattgiarra/virt/virt1/bin/activate; python %s %s %s %d %d %d %d %d %d %d %d %s %s', ...
+%     code_name, input_directory, input_image_ext, start_data, end_data, scan_start_row, scan_end_row,...
+%     white_start, white_end, dark_start, dark_end, data_class, output_dir, output_file_name);
+%     
+String = sprintf('source /Users/mattgiarra/virt_env/virt1/bin/activate; python %s %s %s %d %d %d %d %d %d %d %d %s %s %s', ...
+    code_name, input_directory, input_image_ext, start_data, end_data, scan_start_row, scan_end_row,...
+    white_start, white_end, dark_start, dark_end, data_class, '~/Desktop/', output_file_name);
+    
 % This returns 0 if the code ran successfully, I think.
-pyReturn = system(command);
+pyReturn = system(String);
 
 end
 

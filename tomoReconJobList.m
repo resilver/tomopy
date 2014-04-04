@@ -31,8 +31,6 @@ SegmentItem = DefaultJob;
 SegmentItem.JobOptions.ConvertHDF4ToTiff = false;
 SegmentItem.JobOptions.ConvertTiffToHDF5 = true;
 SegmentItem.JobOptions.ConvertHDF5ToRecon = false;
-SegmentItem.HDF4_To_Tiff.StartImage = 1;
-SegmentItem.HDF4_To_Tiff.EndImage = 100;
 JOBLIST(end + 1) = updateJobList(SegmentItem, 'A02');
 
 % Third job
@@ -41,6 +39,15 @@ SegmentItem.JobOptions.ConvertHDF4ToTiff = true;
 SegmentItem.JobOptions.ConvertTiffToHDF5 = false;
 SegmentItem.JobOptions.ConvertHDF5ToRecon = false;
 JOBLIST(end + 1) = updateJobList(SegmentItem, 'A03');
+
+% Third job
+SegmentItem = DefaultJob;
+SegmentItem.JobOptions.ConvertHDF4ToTiff = true;
+SegmentItem.JobOptions.ConvertTiffToHDF5 = false;
+SegmentItem.JobOptions.ConvertHDF5ToRecon = false;
+JOBLIST(end + 1) = updateJobList(SegmentItem, 'A04');
+
+
 
 
 end

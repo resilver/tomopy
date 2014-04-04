@@ -45,6 +45,8 @@ for n = 1 : nJobs
 
     %% This part converts the raw HDF4 images to tiffs
     % if that option was specified in the job file.
+    % Always do this for now.
+%     if true;
     if JobFile.JobOptions.ConvertHDF4ToTiff 
         % Inform the user
         disp(['Copying set ' inputDataDir ' --> ' outputDir '...']);
@@ -96,6 +98,7 @@ for n = 1 : nJobs
     
     %% This part converts the TIF images to HDF5 format.
     if JobFile.JobOptions.ConvertTiffToHDF5
+%     if 1 == 0; % This is disabled because I can't get it to work.
         try
             tiff_to_hdf5(JobFile);
         catch ER
@@ -105,7 +108,9 @@ for n = 1 : nJobs
     end
     
     %% This part runs the tomographic reconstructions.
-    if JobFile.JobOptions.ConvertHDF5ToRecon
+    % This is disabled.
+    if 1 == 0;
+%     if JobFile.JobOptions.ConvertHDF5ToRecon
         try
             runTomoReconstructions(JobFile);        
         catch ER
