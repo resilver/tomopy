@@ -46,14 +46,14 @@ def im2hd5(dirName='.', imageExt='tif', dataStart=0, dataEnd=None, scanStartRow=
     exchangeGrp.create_dataset('data', data=projectionData, dtype=dataClass);
     
     # This determines the file names of the whitefield images.
-    if whiteStart > -1:
+    if whiteStart != None:
         whiteData = readImageStack(dirName, imageExt, whiteStart, whiteEnd, dataClass=dataClass, scanStartRow=scanStartRow, scanEndRow=scanEndRow);
         # This creates a dataset called "data_white" within the group "exchange".
         # This dataset holds the raw whitefield images.
         exchangeGrp.create_dataset('data_white', data=whiteData, dtype=dataClass);
         
     # This determines the file names of the darkfield images.
-    if darkStart > -1:
+    if darkStart != None:
         darkData = readImageStack(dirName, imageExt, darkStart, darkEnd, dataClass=dataClass, scanStartRow=scanStartRow, scanEndRow=scanEndRow); 
         # This creates a dataset called "data_dark" within the group "exchange".
         # This dataset holds the raw darkfield images.
@@ -74,11 +74,11 @@ def readImageStack(dirName='.', imageExt='tif', dataStart=0, dataEnd=None, scanS
     nImages = len(fileList)
     
     # This makes a list of images numbers.
-    if dataEnd:
+    if dataEnd!=None:
         lastImage = dataEnd
     else:lastImage = len(fileList)
             
-    imageNumbers = range(dataStart, lastImage);
+    imageNumbers = range(dataStart, lastImage + 1);
     
     # Load in the first image to determine its dimensions, class, etc
     imageSize = Image.open(os.path.join(dirName, fileList[0])).size;
@@ -97,7 +97,9 @@ def readImageStack(dirName='.', imageExt='tif', dataStart=0, dataEnd=None, scanS
     nScanRows = endRow - scanStartRow;
     
     # Initialize the array to hole the images
-    imageStack = np.zeros([nImages-1, nScanRows, imageWidth], dataClass)
+    imageStack = np.zeros([nImages, nScanRows, imageWidth], dataClass)
+    #imageStack = np.zeros([nImages, nScanRows, imageWidth], dataClass)
+    #pdb.set_trace()
     
     # This loads each image. This seems like a bad way to do this because we have to hold the entire image stack in memory, so systems without a ton of memory will crash. 
     for k in range(len(imageNumbers)):
@@ -131,7 +133,7 @@ def listImageFiles(dirName='.', imageExt='tif', dataStart=0, dataEnd=None):
     fileList = [fileName for fileName in dirContents if re.search('.*\.%s' %(imageExt), fileName)]
     
     # This returns the section of the image list between the start and end image numbers.
-    if dataEnd:
+    if dataEnd != None:
         return fileList[dataStart : dataEnd + 1]
     else:
         return fileList;

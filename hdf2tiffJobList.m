@@ -19,40 +19,30 @@ DefaultJob.JobOptions.DoReconstructions = false;
 % DefaultJob.HDF5_to_recon;
 
 
-%% Specify where to find the data
+%% Parameters for converting HDF4 to Tiff
 % Data repositories
+DefaultJob.CaseName = 'A01';
 
 % Input and ouput file extensions
-DefaultJob.HDf4_To_Tiff.InputFileExtension = 'hdf';
-DefaultJob.HDf4_To_Tiff.OutputFileExtension = '.tif';
 
-DefaultJob.InputDataRepository = '/Volumes/Xray_data/Tomo_data_archive_1/2008_11_32ID-Drosophila';
-DefaultJob.InputCaseName = 'A01';
-DefaultJob.InputDataDir = fullfile(DefaultJob.InputCaseName, 'raw');
-
-DefaultJob.OutputDataRepository = '/Users/mattgiarra/Documents/tomography/data/xray_data/2008_11_32ID-Drosophila/';
-DefaultJob.OutputCaseName = 'A01';
-DefaultJob.OutputDataDir = fullfile(DefaultJob.OutputCaseName, strrep(DefaultJob.OutputFileExtension, '.', ''));
-
-
-
-% Name of the data within the raw HDF files. 
-% The reconstruction code looks for this,
-% so I think it has to be named '/data' to be compatible.
-DefaultJob.HdfDataName = '/data';
+DefaultJob.HDF4_To_Tiff.InputDataRepository = '/Volumes/Xray_data/Tomo_data_archive_1/2008_11_32ID-Drosophila';
+DefaultJob.HDF4_To_Tiff.InputDataDir = fullfile(DefaultJob.InputCaseName, 'raw');
+DefaultJob.HDF4_To_Tiff.InputFileExtension = 'hdf';
+DefaultJob.HDF4_To_Tiff.HdfDataName = '/data';
+DefaultJob.HDF4_To_Tiff.OutputFileExtension = '.tif';
+DefaultJob.HDF4_To_Tiff.OutputDataRepository = '/Users/mattgiarra/Documents/tomography/data/xray_data/2008_11_32ID-Drosophila/';
+DefaultJob.HDF4_To_Tiff.OutputCaseName = DefaultJob.CaseName ;
+DefaultJob.HDF4_To_Tiff.OutputDataDir = fullfile(DefaultJob.OutputCaseName, strrep(DefaultJob.OutputFileExtension, '.', ''));
 
 % Image numbers. Set endImage = inf and StartImage to 0 
 %to transfer all .hdf images found
-DefaultJob.EndImage = inf;
-DefaultJob.StartImage = 0;
+DefaultJob.HDF4_To_Tiff.EndImage = inf;
+DefaultJob.HDF4_To_Tiff.StartImage = 0;
 
-
-
+%% Parameters for converting Tiffs to HDF5
 DefaultJob.Tiff_To_HDF5.InputDirectory = DefaultJob.HDf4_To_Tiff.OutputDataDir;
 DefaultJob.Tiff_To_HDF5.ImageExt = DefaultJob.HDf4_To_Tiff.OutputFileExtension;
-
 DefaultJob.Tiff_To_HDF5.StartData = 1;
-
 DefaultJob.Tiff_To_HDF5.EndData = false;
 DefaultJob.Tiff_To_HDF5.ScanStartRow = 0;
 DefaultJob.Tiff_To_HDF5.ScanEndRow = false;
@@ -63,11 +53,7 @@ DefaultJob.Tiff_To_HDF5.DarkEnd = false;
 DefaultJob.Tiff_To_HDF5.DataClass = 'uint16';
 DefaultJob.Tiff_To_HDF5.OutputDir = fullfile(DefaultJob.OutputDataRepository, DefaultJob.OutputCaseName, 'h5');
 DefaultJob.Tiff_To_HDF5.OutputFileName = [DefaultJob.OutputCaseName '.h5'];
-DefaultJob.Tiff_To_HDF5.CodeName = ;
-
-
-
-
+DefaultJob.Tiff_To_HDF5.CodeName = 'im2hd5.py';
 
 
 
