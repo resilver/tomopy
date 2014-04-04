@@ -10,7 +10,8 @@ import datetime
 import shutil
 
 
-def im2hd5(dirName='.', imageExt='tif', dataStart=0, dataEnd=None, scanStartRow=0, scanEndRow=None, whiteStart=None, whiteEnd=None, darkStart=None, darkEnd=None, dataClass = 'uint16', outputDir='.', outputFileName = 'out.h5'):
+ def im2hd5(dirName='.', imageExt='tif', dataStart=0, dataEnd=None, scanStartRow=0, scanEndRow=None, whiteStart=None, whiteEnd=None, darkStart=None, darkEnd=None, dataClass = 'uint16', outputDir='.', outputFileName = 'out.h5'):
+#def main(argv):
     # This function converts a directory full of sequentially-numbered images into an HDF5 file.
     # scanStartRow and scanEndRow specify the vertical range of data to convert into the HDF5 file, 
     # e.g., if you wanted to make an HDF5 file to quickly test reconstruction on just a few slices of data
@@ -137,8 +138,12 @@ def listImageFiles(dirName='.', imageExt='tif', dataStart=0, dataEnd=None):
         return fileList[dataStart : dataEnd + 1]
     else:
         return fileList;
-        
-        
+         
+
+# Some plumbing
+if __name__ == "__main__":
+    import sys, PythonCall
+    PythonCall.PythonCall(sys.argv).execute()
 
 
     
