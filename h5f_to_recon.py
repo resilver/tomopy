@@ -15,7 +15,13 @@ def h5f_to_recon(dirName='.', inputFileName='out.h5', startSlice=None, endSlice=
     d.correct_drift()
     d.phase_retrieval()
     d.correct_drift()
-    # d.center=661.5
+    
+    # Appliy a median filter to the (images?) to improve the chance of success of the center finder.
+    d.median_filter()
+    
+    # Find the center of rotation
+    d.optimize_center()
+    #d.center=661.5
     d.gridrec()
 
 

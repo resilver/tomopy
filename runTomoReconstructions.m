@@ -11,22 +11,26 @@ end_slice = JobFile.HDF5_To_Recon.EndSlice;
 output_dir = JobFile.HDF5_To_Recon.OutputDir;
 code_name = JobFile.HDF5_To_Recon.CodeName;
 
+
+% These data can be either numbers or strings
+ambiguous_data = {start_slice; end_slice};
+
+% Convert all the ambiguous data to strings.
+for k = 1 : length(ambiguous_data)
+    stringData{k} = num2str(ambiguous_data{k});
+end
+
 % Make the output directory if it doesn't exist.
 if ~exist(output_dir, 'dir');
     mkdir(output_dir)
 end
 
-pythonInput = sprintf(...
-           ['%s(dirName=''%s'', inputFileName=''%s'', '...
-       'startSlice=%d','endSlice=%d, outDir=%s, '...
-       code_name, dir_name, input_file_name, start_slice, end_slice, output_dir]);
-
-% This is the command line statement that will run the code.
-command = sprintf('python -c ''%s''', pythonInput);
-
+% Create the string to be run   
+String = sprintf('source /Users/mattgiarra/virt_env/virt1/bin/activate; python %s %s %s %s %s %s', ...
+    code_name, dir_name, input_file_name, stringData{:}, output_dir);
+    
 % This returns 0 if the code ran successfully, I think.
-pyReturn = system(command);
-
+pyReturn = system(String);
 
 
 end
