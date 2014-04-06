@@ -2,7 +2,7 @@
 import tomopy
 import os
 
-def h5f_to_recon(dirName='.', inputFileName='out.h5', startSlice=None, endSlice=None, outDir='.'):
+def h5f_to_recon(dirName='.', inputFileName='out.h5', startSlice=None, endSlice=None, outDir='.', center='1008'):
 
     inputFilePath = os.path.join(dirName, inputFileName)
 

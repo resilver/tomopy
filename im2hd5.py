@@ -10,7 +10,7 @@ import getopt
 import sys
 import pdb
 
-def im2hd5(dirName='.', imageExt='tif', dataStart=0, dataEnd=None, scanStartRow=0, scanEndRow=None, whiteStart=None, whiteEnd=None, darkStart=None, darkEnd=None, dataClass = 'uint16', outputDir='.', outputFileName = 'out.h5'):
+def im2hd5(dirName='.', imageExt='tif', dataStart=0, dataEnd=None, dataBase=None, whiteBase=None, darkBase=None, scanStartRow=0, scanEndRow=None, whiteStart=None, whiteEnd=None, darkStart=None, darkEnd=None, dataClass = 'uint16', outputDir='.', outputFileName = 'out.h5', numDig=5):
 #def main(argv):
     # This function converts a directory full of sequentially-numbered images into an HDF5 file.
     # scanStartRow and scanEndRow specify the vertical range of data to convert into the HDF5 file, 
@@ -49,21 +49,21 @@ def im2hd5(dirName='.', imageExt='tif', dataStart=0, dataEnd=None, scanStartRow=
     exchangeGrp = h5File.create_group("exchange");     
     
     # This determines the file names of the projection images.
-    projectionData = readImageStack(dirName, imageExt, dataStart, dataEnd, dataClass=dataClass, scanStartRow=scanStartRow, scanEndRow=scanEndRow);
+    projectionData = readImageStack(dirName, imageExt, dataStart, dataEnd, dataClass=dataClass, scanStartRow=scanStartRow, scanEndRow=scanEndRow, baseName=dataBase, numDig=numDig);
     # This creates a dataset called "data" within the group "exchange".
     # This dataset holds the raw projection images.
     exchangeGrp.create_dataset('data', data=projectionData, dtype=dataClass);
     
     # This determines the file names of the whitefield images.
     if whiteStart != None:
-        whiteData = readImageStack(dirName, imageExt, whiteStart, whiteEnd, dataClass=dataClass, scanStartRow=scanStartRow, scanEndRow=scanEndRow);
+        whiteData = readImageStack(dirName, imageExt, whiteStart, whiteEnd, dataClass=dataClass, scanStartRow=scanStartRow, scanEndRow=scanEndRow, baseName=whiteBase, numDig=numDig);
         # This creates a dataset called "data_white" within the group "exchange".
         # This dataset holds the raw whitefield images.
         exchangeGrp.create_dataset('data_white', data=whiteData, dtype=dataClass);
         
     # This determines the file names of the darkfield images.
     if darkStart != None:
-        darkData = readImageStack(dirName, imageExt, darkStart, darkEnd, dataClass=dataClass, scanStartRow=scanStartRow, scanEndRow=scanEndRow); 
+        darkData = readImageStack(dirName, imageExt, darkStart, darkEnd, dataClass=dataClass, scanStartRow=scanStartRow, scanEndRow=scanEndRow, baseName=darkBase, numDig=numDig); 
         # This creates a dataset called "data_dark" within the group "exchange".
         # This dataset holds the raw darkfield images.
         exchangeGrp.create_dataset('data_dark', data=darkData, dtype=dataClass);
@@ -71,13 +71,13 @@ def im2hd5(dirName='.', imageExt='tif', dataStart=0, dataEnd=None, scanStartRow=
     # This closes the hdf5 file.
     h5File.close();
 
-def readImageStack(dirName='.', imageExt='tif', dataStart=0, dataEnd=None, scanStartRow=0, scanEndRow=None, dataClass='uint16'):
+def readImageStack(dirName='.', imageExt='tif', dataStart=0, dataEnd=None, scanStartRow=0, scanEndRow=None, dataClass='uint16', baseName=None, numDig=5):
     # This function reads a series of images and returns a 3-D array that contains all the images in the series.
     # readImageStack searches the directory named dirName for files that end in the extension imageExt. 
     # Then it returns the first dataEnd - dataStart images.
     
     # This gets a list of the images to read
-    fileList = listImageFiles(dirName, imageExt, dataStart, dataEnd);
+    fileList = listImageFiles(dirName, imageExt, dataStart, dataEnd, baseName=baseName, numDig=numDig);
     
     # Determine the number of images
     nImages = len(fileList)
@@ -110,7 +110,7 @@ def readImageStack(dirName='.', imageExt='tif', dataStart=0, dataEnd=None, scanS
     imageStack = np.zeros([nImages, nScanRows, imageWidth], dataClass)
     
     # This loads each image. This seems like a bad way to do this because we have to hold the entire image stack in memory, so systems without a lot of memory could crash. 
-    for k in range(len(imageNumbers)):
+    for k in range(nImages):
         # This determines the file path to the k'th image
         if k % 10 is 0:
             print "On image %d of %d" %(k, nImages)
@@ -127,7 +127,7 @@ def readImageStack(dirName='.', imageExt='tif', dataStart=0, dataEnd=None, scanS
     # This returns the image stack.
     return imageStack
     
-def listImageFiles(dirName='.', imageExt='tif', dataStart=0, dataEnd=None):
+def listImageFiles(dirName='.', imageExt='tif', dataStart=0, dataEnd=None, baseName=None, numDig=5):
     """
     This function returns a list of all the images of extension imType in the directory dirName. The returned list contains the first dataStart:dataEnd images.
     The issue with this is that it will return other files of similar extension, which means that the raw data directory shouldn't have any other image files in it.
@@ -137,13 +137,18 @@ def listImageFiles(dirName='.', imageExt='tif', dataStart=0, dataEnd=None):
     dirContents = os.listdir(dirName)
     
     # This determines which files in fileList end with the extension imType
-    fileList = [fileName for fileName in dirContents if re.search('.*\.%s' %(imageExt), fileName)]
-    
+    fileList = [fileName for fileName in dirContents if re.search('.*\.%s' %(imageExt), fileName) is not None]
+    if baseName is not None:
+        fileList = [fileName for fileName in fileList if re.search('%s\d{%d}' %(baseName, numDig), fileName) is not None]
     # This returns the section of the image list between the start and end image numbers.
-    if dataEnd != None:
-        return fileList[dataStart : dataEnd + 1]
-    else:
-        return fileList;
+    #pdb.set_trace()
+    if dataEnd is None:
+        dataEnd = len(fileList) - 1
+    if dataStart is None:
+        dataStart = 0
+    
+    return fileList[dataStart : dataEnd + 1]
+
          
 # These lines allow the code to be run from the command line.
 if __name__ == "__main__":

@@ -19,8 +19,8 @@ DefaultJob.JobOptions.ConvertHDF5ToRecon = false;
 DefaultJob.CaseName = 'A01';
 
 % Output data repository
-DefaultJob.OutputDataRepository = '/Users/mattgiarra/Documents/tomography/data/xray_data/2008_11_32ID-Drosophila/';
-DefaultJob.InputDataRepository = '/Volumes/Xray_data/Tomo_data_archive_1/2008_11_32ID-Drosophila';
+DefaultJob.OutputDataRepository = '/Users/mattgiarra/Documents/tomography/data/2013_07_2BM_copy/Jeff';
+DefaultJob.InputDataRepository = '/Volumes/128.173.163.248/2013_07_2BM_copy/Jeff';
 
 % Input and ouput file extensions
 
