@@ -2,9 +2,13 @@
 import tomopy
 import os
 
-def h5f_to_recon(dirName='.', inputFileName='out.h5', startSlice=None, endSlice=None, outDir='.', center='1008'):
+def hdf5_to_recon(dirName='.', inputFileName='out.h5', startSlice=None, endSlice=None, outDir='tmp', outBase = 'recon_', center=None):
 
+    # This is the path to the input HDF5 file.
     inputFilePath = os.path.join(dirName, inputFileName)
+
+    # This is the path to the output files
+    outPath = os.path.join(outDir, outBase)
 
     # Read HDF5 file.
     data, white, dark, theta = tomopy.xtomo_reader(inputFilePath, slices_start=startSlice, slices_end=endSlice)
@@ -20,11 +24,14 @@ def h5f_to_recon(dirName='.', inputFileName='out.h5', startSlice=None, endSlice=
     d.median_filter()
     
     # Find the center of rotation
-    d.optimize_center()
-    #d.center=661.5
+    if center == None:
+        d.optimize_center()
+    else:
+        d.center=center
+    
+    # Do the tomographic reconstruction
     d.gridrec()
 
-
     # Write to stack of TIFFs.
-    tomopy.xtomo_writer(d.data_recon, outDir, axis=0)
+    tomopy.xtomo_writer(d.data_recon, outPath, axis=0, x_start=startSlice)
 

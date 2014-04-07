@@ -10,11 +10,7 @@ import getopt
 import sys
 import pdb
 
-def im2hd5(dirName='.', imageExt='tif', dataStart=0, dataEnd=None, dataBase=None, whiteBase=None, darkBase=None, scanStartRow=0, scanEndRow=None, whiteStart=None, whiteEnd=None, darkStart=None, darkEnd=None, dataClass = 'uint16', outputDir='.', outputFileName = 'out.h5', numDig=5):
-#def main(argv):
-    # This function converts a directory full of sequentially-numbered images into an HDF5 file.
-    # scanStartRow and scanEndRow specify the vertical range of data to convert into the HDF5 file, 
-    # e.g., if you wanted to make an HDF5 file to quickly test reconstruction on just a few slices of data
+def im2hd5(dirName='.', imageExt='tif', scanStartRow=0, scanEndRow=None, dataBase=None, whiteBase=None, darkBase=None, dataStart=0, dataEnd=None,  whiteStart=None, whiteEnd=None, darkStart=None, darkEnd=None, dataClass = 'uint16', outputDir='.', outputFileName = 'out.h5', numDig=5):
        
     # Figure out the output file path
     outputFilePath = os.path.join(outputDir, outputFileName)  
@@ -52,7 +48,7 @@ def im2hd5(dirName='.', imageExt='tif', dataStart=0, dataEnd=None, dataBase=None
     projectionData = readImageStack(dirName, imageExt, dataStart, dataEnd, dataClass=dataClass, scanStartRow=scanStartRow, scanEndRow=scanEndRow, baseName=dataBase, numDig=numDig);
     # This creates a dataset called "data" within the group "exchange".
     # This dataset holds the raw projection images.
-    exchangeGrp.create_dataset('data', data=projectionData, dtype=dataClass);
+    group_data = exchangeGrp.create_dataset('data', data=projectionData, dtype=dataClass);
     
     # This determines the file names of the whitefield images.
     if whiteStart != None:
