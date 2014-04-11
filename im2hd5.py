@@ -10,9 +10,11 @@ import getopt
 import sys
 import pdb
 
-def im2hd5(dirName='.', imageExt='tif', scanStartRow=0, scanEndRow=None, dataBase=None, whiteBase=None, darkBase=None, dataStart=0, dataEnd=None,  whiteStart=None, whiteEnd=None, darkStart=None, darkEnd=None, dataClass = 'uint16', outputDir='.', outputFileName = 'out.h5', numDig=5):
+def im2hd5(inputDir = '.', imageExt='tif', scanStartRow=0, scanEndRow=None, dataBase=None, whiteBase=None, darkBase=None, dataStart=0, dataEnd=None,  whiteStart=None, whiteEnd=None, darkStart=None, darkEnd=None, dataClass = 'uint16', outputDir='.', outputFileName = 'out.h5', numDig=5):
        
-    
+    # Create the output directory if it doesn't already exist.
+    if not os.path.exists(outputDir):
+        os.makedirs(outputDir)
        
     # Figure out the output file path
     outputFilePath = os.path.join(outputDir, outputFileName)  
@@ -47,21 +49,21 @@ def im2hd5(dirName='.', imageExt='tif', scanStartRow=0, scanEndRow=None, dataBas
     exchangeGrp = h5File.create_group("exchange");     
     
     # This determines the file names of the projection images.
-    projectionData = readImageStack(dirName, imageExt, dataStart, dataEnd, dataClass=dataClass, scanStartRow=scanStartRow, scanEndRow=scanEndRow, baseName=dataBase, numDig=numDig);
+    projectionData = readImageStack(inputDir, imageExt, dataStart, dataEnd, dataClass=dataClass, scanStartRow=scanStartRow, scanEndRow=scanEndRow, baseName=dataBase, numDig=numDig);
     # This creates a dataset called "data" within the group "exchange".
     # This dataset holds the raw projection images.
     group_data = exchangeGrp.create_dataset('data', data=projectionData, dtype=dataClass);
     
     # This determines the file names of the whitefield images.
     if whiteStart != None:
-        whiteData = readImageStack(dirName, imageExt, whiteStart, whiteEnd, dataClass=dataClass, scanStartRow=scanStartRow, scanEndRow=scanEndRow, baseName=whiteBase, numDig=numDig);
+        whiteData = readImageStack(inputDir, imageExt, whiteStart, whiteEnd, dataClass=dataClass, scanStartRow=scanStartRow, scanEndRow=scanEndRow, baseName=whiteBase, numDig=numDig);
         # This creates a dataset called "data_white" within the group "exchange".
         # This dataset holds the raw whitefield images.
         exchangeGrp.create_dataset('data_white', data=whiteData, dtype=dataClass);
         
     # This determines the file names of the darkfield images.
     if darkStart != None:
-        darkData = readImageStack(dirName, imageExt, darkStart, darkEnd, dataClass=dataClass, scanStartRow=scanStartRow, scanEndRow=scanEndRow, baseName=darkBase, numDig=numDig); 
+        darkData = readImageStack(inputDir, imageExt, darkStart, darkEnd, dataClass=dataClass, scanStartRow=scanStartRow, scanEndRow=scanEndRow, baseName=darkBase, numDig=numDig); 
         # This creates a dataset called "data_dark" within the group "exchange".
         # This dataset holds the raw darkfield images.
         exchangeGrp.create_dataset('data_dark', data=darkData, dtype=dataClass);

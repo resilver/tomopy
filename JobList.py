@@ -25,7 +25,9 @@ im2hd5(dirName=tiffInputDir, dataBase=dataBase, dataStart=dataStart, dataEnd=dat
 #__________TOMOGRAPHIC RECONSTRUCTIONS_______________
 
 # Directory in which to find the HDF5 file.
-reconstructionInputDir = "/Users/mattgiarra/Documents/tomography/data/2013_07_2BM_copy/Jeff/test_sample_Diplo_4/h5"
+reconstructionInputDir = "/Users/mattgiarra/Documents/tomography/data/2013_07_2BM_copy/Jeff/test_sample_Diplo_4/hdf"
+
+reconInputFile = "test_sample_Diplo_4.hd5"
 
 # Output directory for tomographic reconstructions
 outDir = "/Users/mattgiarra/Documents/tomography/data/2013_07_2BM_copy/Jeff/test_sample_Diplo_4/recon"
@@ -35,7 +37,7 @@ outBase = "Diplodocus_1_200mm_4_";
 
 # Stard and end slice numbers
 startSlice = 500;
-endSlice = 550;
+endSlice = 510;
 
 # Center location. If this isn't specified, the code will find the center.
 center=1015.08752441
@@ -47,7 +49,7 @@ center=1015.08752441
 %run hdf5_to_recon
 
 # Do the tomographic reconstruction.
-hdf5_to_recon(dirName=reconstructionInputDir, outBase = outBase, outDir=outDir, startSlice=startSlice, endSlice=endSlice, center=center)
+hdf5_to_recon(dirName=reconstructionInputDir, inputFileName = reconInputFile, outBase = outBase, outDir=outDir, startSlice=startSlice, endSlice=endSlice, center=center)
 
 
 

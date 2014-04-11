@@ -2,13 +2,17 @@
 import tomopy
 import os
 
-def hdf5_to_recon(dirName='.', inputFileName='out.h5', startSlice=None, endSlice=None, outDir='tmp', outBase = 'recon_', center=None):
+def hdf5_to_recon(inputDir = '.', inputFileName='out.h5', startSlice=None, endSlice=None, outputDir='./recon', outBase = 'recon_', center=None):
+
+    # Make the output directory if it doesn't already exist.
+    if not os.path.exists(outputDir):
+        os.makedirs(outputDir)
 
     # This is the path to the input HDF5 file.
-    inputFilePath = os.path.join(dirName, inputFileName)
+    inputFilePath = os.path.join(inputDir, inputFileName)
 
     # This is the path to the output files
-    outPath = os.path.join(outDir, outBase)
+    outputPath = os.path.join(outputDir, outBase)
 
     # Read HDF5 file.
     data, white, dark, theta = tomopy.xtomo_reader(inputFilePath, slices_start=startSlice, slices_end=endSlice)
@@ -33,5 +37,5 @@ def hdf5_to_recon(dirName='.', inputFileName='out.h5', startSlice=None, endSlice
     d.gridrec()
 
     # Write to stack of TIFFs.
-    tomopy.xtomo_writer(d.data_recon, outPath, axis=0, x_start=startSlice)
+    tomopy.xtomo_writer(d.data_recon, outputPath, axis=0, x_start=startSlice)
 
