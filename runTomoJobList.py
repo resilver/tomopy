@@ -4,7 +4,7 @@ def runTomoJobList(imgJobList, reconJobList):
     nJobs = len(imgJobList)
     
     # Loop over all the jobs
-    for k in range(nJobs + 1):
+    for k in range(nJobs):
         
         # Read the job files.
         imgJobFile = imgJobList[k];
