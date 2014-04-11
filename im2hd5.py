@@ -12,6 +12,8 @@ import pdb
 
 def im2hd5(dirName='.', imageExt='tif', scanStartRow=0, scanEndRow=None, dataBase=None, whiteBase=None, darkBase=None, dataStart=0, dataEnd=None,  whiteStart=None, whiteEnd=None, darkStart=None, darkEnd=None, dataClass = 'uint16', outputDir='.', outputFileName = 'out.h5', numDig=5):
        
+    
+       
     # Figure out the output file path
     outputFilePath = os.path.join(outputDir, outputFileName)  
     
@@ -72,14 +74,18 @@ def readImageStack(dirName='.', imageExt='tif', dataStart=0, dataEnd=None, scanS
     # readImageStack searches the directory named dirName for files that end in the extension imageExt. 
     # Then it returns the first dataEnd - dataStart images.
     
+    # Make sure dataStart has a value
+    if dataStart == None:
+        dataStart = 0
+    
     # This gets a list of the images to read
     fileList = listImageFiles(dirName, imageExt, dataStart, dataEnd, baseName=baseName, numDig=numDig);
     
     # Determine the number of images
     nImages = len(fileList)
-    
+
     # This makes a list of images numbers.
-    if dataEnd!=None:
+    if dataEnd != None:
         lastImage = dataEnd
         #else:lastImage = len(fileList)
         imageNumbers = range(dataStart, lastImage + 1);
